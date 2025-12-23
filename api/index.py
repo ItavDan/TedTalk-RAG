@@ -15,7 +15,6 @@ app = FastAPI()
 # Initialize LangChain models
 llm = ChatOpenAI(
     model=LLM_MODEL,
-    temperature=0,
     api_key=OPENAI_API_KEY,
     base_url=OPENAI_BASE_URL
 )
@@ -91,7 +90,7 @@ async def handle_prompt(request: QueryRequest):
             response=result["answer"],
             context=context_items,
             Augmented_prompt=AugmentedPrompt(
-                System=SYSTEM_PROMPT,
+                System=(GENERAL_PROMPT + "\n\n" + CONTEXT_PROMPT),
                 User=request.question
             )
         )

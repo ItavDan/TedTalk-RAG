@@ -7,7 +7,7 @@ from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-from Constants import *
+from .Constants import *
 
 # Initialize FastAPI
 app = FastAPI()

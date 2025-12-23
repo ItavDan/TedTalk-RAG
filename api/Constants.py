@@ -26,8 +26,8 @@ RAG_CONFIG = {
     "top_k": 3
 }
 
-# System Prompt
-SYSTEM_PROMPT = """
+# Prompts
+GENERAL_PROMPT = """
 You are a TED Talk assistant that answers questions strictly and
 only based on the TED dataset context provided to you (metadata
 and transcript passages). You must not use any external
@@ -37,6 +37,9 @@ determined from the provided context, respond: “I don’t know
 based on the provided TED data.” Always explain your answer
 using the given context, quoting or paraphrasing the relevant
 transcript or metadata when helpful.
+"""
+CONTEXT_PROMPT = """
+Given the following context, please answer the user's question:\n\n{context}
 """
 
 # Data directories

@@ -33,7 +33,8 @@ vectorstore = PineconeVectorStore(
 
 # Initialize LLM prompt and chain
 prompt_template = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT),
+    ("system", GENERAL_PROMPT),
+    ("system", CONTEXT_PROMPT),
     ("human", "{input}"),
 ])
 question_answer_chain = create_stuff_documents_chain(llm, prompt_template)

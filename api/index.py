@@ -16,7 +16,8 @@ app = FastAPI()
 llm = ChatOpenAI(
     model=LLM_MODEL,
     api_key=OPENAI_API_KEY,
-    base_url=OPENAI_BASE_URL
+    base_url=OPENAI_BASE_URL,
+    temperature=1
 )
 embedder = OpenAIEmbeddings(
     model=EMBEDDING_MODEL,

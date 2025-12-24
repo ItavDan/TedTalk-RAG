@@ -22,37 +22,9 @@ tags_metadata = [
 app = FastAPI(
     title="TED-Talk RAG Assistant API",
     description="""
-    ## TED-Talk RAG Assistant API
-
-    A Retrieval-Augmented Generation (RAG) system that answers questions based on TED Talk transcripts.
-
-    ### Overview
-    This API uses a vector database (Pinecone) to retrieve relevant TED Talk transcript chunks and an LLM to generate 
-    accurate answers based solely on the provided context. The system ensures responses are grounded in actual TED Talk 
-    content rather than hallucinated information.
-
-    ### Architecture
-    - **Embeddings**: OpenAI text-embedding-3-small model for semantic search
-    - **LLM**: GPT-5-mini for answer generation
-    - **Vector Store**: Pinecone for efficient similarity search
-    - **RAG Configuration**: Configurable chunk size, overlap ratio, and top-k retrieval
-
-    ### Main Endpoints
-    - `POST /api/prompt` - Submit a question and receive an answer with context and augmented prompt
-    - `GET /api/stats` - View current RAG configuration parameters
-    - `GET /` - Health check endpoint
-
-    ### Usage
-    Send a POST request to `/api/prompt` with a JSON body containing your question:
-    ```json
-    {
-        "question": "I’m looking for a TED talk about climate change and what individuals can do in their daily lives. Which talk would you recommend?"
-    }
-    ```
-
-    The API returns the answer, relevant context chunks with metadata (title, speaker, content), 
-    and the augmented prompt used for generation.
+    This API provides a Retrieval-Augmented Generation (RAG) service for querying TED Talk transcripts.
     
+    It leverages OpenAI for embeddings and generation, and Pinecone for vector storage, allowing users to perform semantic searches and receive context-aware answers grounded in real TED Talk content.
     """,
     version="1.0.0",
     contact={

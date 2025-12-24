@@ -24,9 +24,9 @@ EMBED_ALL = True
 
 # RAG Parameters
 RAG_CONFIG = {
-    "chunk_size": 4000,
-    "overlap_ratio": 0.1,
-    "top_k": 3
+    "chunk_size": 1024,
+    "overlap_ratio": 0.2,
+    "top_k": 6
 }
 
 # Prompts

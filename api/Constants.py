@@ -26,21 +26,11 @@ EMBED_ALL = True
 RAG_CONFIG = {
     "chunk_size": 1024,
     "overlap_ratio": 0.2,
-    "top_k": 6
+    "top_k": 12
 }
 
 # Prompts
-GENERAL_PROMPT = """
-You are a TED Talk assistant that answers questions strictly and
-only based on the TED dataset context provided to you (metadata
-and transcript passages). You must not use any external
-knowledge, the open internet, or information that is not explicitly
-contained in the retrieved context. If the answer cannot be
-determined from the provided context, respond: “I don’t know
-based on the provided TED data.” Always explain your answer
-using the given context, quoting or paraphrasing the relevant
-transcript or metadata when helpful.
-"""
+GENERAL_PROMPT = """You are a TED Talk assistant that answers questions strictly and only based on the TED dataset context provided to you (metadata and transcript passages). You must not use any external knowledge, the open internet, or information that is not explicitly contained in the retrieved context. If the answer cannot be determined from the provided context, respond: “I don’t know based on the provided TED data.” Always explain your answer using the given context, quoting or paraphrasing the relevant transcript or metadata when helpful."""
 CONTEXT_PROMPT = """
 ### CONTEXT DATA (Read Carefully):
 The following chunks contain explicit metadata lines formatted as "Title: ..." and "Speaker: ...".
@@ -52,6 +42,7 @@ You MUST treat these lines as valid data sources for your answer.
 1. Look at the "Title:" and "Speaker:" lines in the text above. Make sure they are correct, based on the metadata provided.
 2. Use them to answer the user's question.
 3. NEVER claim the metadata is missing. It is provided right above this line.
+4. Before answering, think step-by-step about which chunk, or chunks are most relevant to the user's specific request.
 """
 
 # Data directories

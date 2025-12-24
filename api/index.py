@@ -73,25 +73,39 @@ class QueryResponse(BaseModel):
 @app.post("/api/prompt", response_model=QueryResponse)
 async def handle_prompt(request: QueryRequest):
     try:
-        # Run RAG chain over the input question
+        # Run RAG chain (Retrieval)
         result = rag_chain.invoke({"input": request.question})
 
-        # Retrieve context items from the result
-        context_items = []
+        # Process results to build response and reconstructed prompt
+        context_items, context_text_for_llm = [], []
         for doc in result["context"]:
+            title = doc.metadata.get("title", "Unknown Title")
+            speaker = doc.metadata.get("speaker_1", "Unknown Speaker")
             item = ContextItem(
                 talk_id=str(doc.metadata.get("talk_id", "N/A")),
-                title=doc.metadata.get("title", "Unknown Title"),
+                title=title,
                 chunk=doc.page_content,
+                score=0.0
             )
             context_items.append(item)
 
-        # Get final response
+            # --- CRITICAL FIX: Add Metadata to the text the LLM sees ---
+            # This ensures the LLM knows the speaker and title for each text chunk
+            formatted_text = f"Title: {title}\nSpeaker: {speaker}\nContent: {doc.page_content}"
+            context_text_for_llm.append(formatted_text)
+
+        # Full context
+        full_context_string = "\n\n---\n\n".join(context_text_for_llm)
+
+        # Format the template, Assuming CONTEXT_PROMPT contains "{context}"
+        final_system_prompt = f"{GENERAL_PROMPT}\n\n{CONTEXT_PROMPT.format(context=full_context_string)}"
+
+        # Final Response Payload
         response_payload = QueryResponse(
             response=result["answer"],
             context=context_items,
             Augmented_prompt=AugmentedPrompt(
-                System=(GENERAL_PROMPT + "\n\n" + CONTEXT_PROMPT),
+                System=final_system_prompt,
                 User=request.question
             )
         )
@@ -99,8 +113,8 @@ async def handle_prompt(request: QueryRequest):
         return response_payload
 
     except Exception as e:
-        # Handle exceptions by returning a structured HTTP 500 error response and logging the error details to the terminal
-        print(f"Error: {e}")
+        # Log error for debugging (visible in Vercel logs)
+        print(f"Error processing request: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Initialize GET endpoint

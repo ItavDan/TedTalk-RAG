@@ -4,7 +4,7 @@ from langchain_community.document_loaders import DataFrameLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
-from Constants import *
+from api.Constants import *
 
 
 def ingest_data():
@@ -16,8 +16,12 @@ def ingest_data():
     df = pd.read_csv(DATA_DIR)
 
     # Select first 10 talks for testing
-    df = df.head(10)
-    print(f"Processing {len(df)} talks (Safety mode ON)...")
+    # If you want to process all talks, set EMBED_ALL = True
+    if EMBED_ALL:
+        print(f"Processing all {len(df)} talks...")
+    else:
+        df = df.head(10)
+        print(f"Processing {len(df)} talks (Safety mode ON)...")
 
     # Read data into LangChain documents
     loader = DataFrameLoader(df, page_content_column=TEXT_COLUMN)

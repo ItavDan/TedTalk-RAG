@@ -19,6 +19,9 @@ LLM_MODEL = "RPRTHPB-gpt-5-mini"
 # Pinecone index name
 PINECONE_INDEX_NAME = "ted-rag"
 
+# Embed all documents
+EMBED_ALL = True
+
 # RAG Parameters
 RAG_CONFIG = {
     "chunk_size": 4000,

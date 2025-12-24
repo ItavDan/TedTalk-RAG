@@ -42,7 +42,12 @@ using the given context, quoting or paraphrasing the relevant
 transcript or metadata when helpful.
 """
 CONTEXT_PROMPT = """
-Given the following context, please answer the user's question:\n\n{context}
+The following context chunks are formatted with explicit metadata tags:
+"Title:", "Speaker:", and "Content:". 
+You MUST use the information in the "Title:" and "Speaker:" fields to identify the talk and the speaker.
+
+Context:
+{context}
 """
 
 # Data directories

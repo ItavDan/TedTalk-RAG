@@ -5,8 +5,7 @@ from pydantic import BaseModel
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
+from langchain_core.output_parsers import StrOutputParser
 from .Constants import *
 
 # Initialize FastAPI
@@ -37,15 +36,7 @@ prompt_template = ChatPromptTemplate.from_messages([
     ("system", CONTEXT_PROMPT),
     ("human", "{input}"),
 ])
-question_answer_chain = create_stuff_documents_chain(llm, prompt_template)
-
-# Initialize retriever from Pinecone vectorstore
-retriever = vectorstore.as_retriever(
-    search_kwargs={"k": RAG_CONFIG["top_k"]}
-)
-
-# Create RAG chain
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+simple_rag_chain = prompt_template | llm | StrOutputParser()
 
 
 # Set up API endpoint
@@ -73,43 +64,47 @@ class QueryResponse(BaseModel):
 @app.post("/api/prompt", response_model=QueryResponse)
 async def handle_prompt(request: QueryRequest):
     try:
-        # Run RAG chain (Retrieval)
-        result = rag_chain.invoke({"input": request.question})
+        # Retrieve top-k most similar documents from Pinecone
+        results_with_scores = vectorstore.similarity_search_with_score(
+            request.question,
+            k=RAG_CONFIG["top_k"]
+        )
 
         # Process results to build response and reconstructed prompt
         context_items, context_text_for_llm = [], []
-        for doc in result["context"]:
+        for doc, score in results_with_scores:
             title = doc.metadata.get("title", "Unknown Title")
             speaker = doc.metadata.get("speaker_1", "Unknown Speaker")
+            talk_id = str(doc.metadata.get("talk_id", "N/A"))
+
             item = ContextItem(
-                talk_id=str(doc.metadata.get("talk_id", "N/A")),
+                talk_id=talk_id,
                 title=title,
                 chunk=doc.page_content,
-                score=0.0
+                score=score
             )
             context_items.append(item)
 
-            # --- CRITICAL FIX: Add Metadata to the text the LLM sees ---
-            # This ensures the LLM knows the speaker and title for each text chunk
-            formatted_text = f"""
-            === START OF CHUNK ===
-            Title: {title}
-            Speaker: {speaker}
-            Content:
-            {doc.page_content}
-            === END OF CHUNK ===
-            """
+            formatted_text = (
+                f"=== START OF CHUNK ===\n"
+                f"Title: {title}\n"
+                f"Speaker: {speaker}\n"
+                f"Content:\n{doc.page_content}\n"
+                f"=== END OF CHUNK ==="
+            )
             context_text_for_llm.append(formatted_text)
 
-        # Full context
+        # Get response from LLM based on context
         full_context_string = "\n\n---\n\n".join(context_text_for_llm)
-
-        # Format the template, Assuming CONTEXT_PROMPT contains {context}
-        final_system_prompt = f"{GENERAL_PROMPT}\n\n{CONTEXT_PROMPT.format(context=full_context_string)}"
+        answer = simple_rag_chain.invoke({
+            "input": request.question,
+            "context": full_context_string
+        })
 
         # Final Response Payload
+        final_system_prompt = f"{GENERAL_PROMPT}\n\n{CONTEXT_PROMPT.format(context=full_context_string)}"
         response_payload = QueryResponse(
-            response=result["answer"],
+            response=answer,
             context=context_items,
             Augmented_prompt=AugmentedPrompt(
                 System=final_system_prompt,

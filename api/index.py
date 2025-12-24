@@ -97,7 +97,7 @@ async def handle_prompt(request: QueryRequest):
         # Full context
         full_context_string = "\n\n---\n\n".join(context_text_for_llm)
 
-        # Format the template, Assuming CONTEXT_PROMPT contains "{context}"
+        # Format the template, Assuming CONTEXT_PROMPT contains {context}
         final_system_prompt = f"{GENERAL_PROMPT}\n\n{CONTEXT_PROMPT.format(context=full_context_string)}"
 
         # Final Response Payload

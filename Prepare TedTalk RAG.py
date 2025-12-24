@@ -14,6 +14,7 @@ def ingest_data():
         return
     print("Reading CSV file...")
     df = pd.read_csv(DATA_DIR)
+    df = df.fillna("")
 
     # Select first 10 talks for testing
     # If you want to process all talks, set EMBED_ALL = True

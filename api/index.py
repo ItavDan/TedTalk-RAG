@@ -91,7 +91,14 @@ async def handle_prompt(request: QueryRequest):
 
             # --- CRITICAL FIX: Add Metadata to the text the LLM sees ---
             # This ensures the LLM knows the speaker and title for each text chunk
-            formatted_text = f"Title: {title}\nSpeaker: {speaker}\nContent: {doc.page_content}"
+            formatted_text = f"""
+            === START OF CHUNK ===
+            Title: {title}
+            Speaker: {speaker}
+            Content:
+            {doc.page_content}
+            === END OF CHUNK ===
+            """
             context_text_for_llm.append(formatted_text)
 
         # Full context

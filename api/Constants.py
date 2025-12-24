@@ -42,12 +42,16 @@ using the given context, quoting or paraphrasing the relevant
 transcript or metadata when helpful.
 """
 CONTEXT_PROMPT = """
-The following context chunks are formatted with explicit metadata tags:
-"Title:", "Speaker:", and "Content:". 
-You MUST use the information in the "Title:" and "Speaker:" fields to identify the talk and the speaker.
+### CONTEXT DATA (Read Carefully):
+The following chunks contain explicit metadata lines formatted as "Title: ..." and "Speaker: ...".
+You MUST treat these lines as valid data sources for your answer.
 
-Context:
 {context}
+
+### INSTRUCTIONS REMINDER:
+1. Look at the "Title:" and "Speaker:" lines in the text above.
+2. Use them to answer the user's question.
+3. NEVER claim the metadata is missing. It is provided right above this line.
 """
 
 # Data directories

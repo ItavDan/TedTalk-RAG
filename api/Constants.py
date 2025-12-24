@@ -49,7 +49,7 @@ You MUST treat these lines as valid data sources for your answer.
 {context}
 
 ### INSTRUCTIONS REMINDER:
-1. Look at the "Title:" and "Speaker:" lines in the text above.
+1. Look at the "Title:" and "Speaker:" lines in the text above. Make sure they are correct, based on the metadata provided.
 2. Use them to answer the user's question.
 3. NEVER claim the metadata is missing. It is provided right above this line.
 """
